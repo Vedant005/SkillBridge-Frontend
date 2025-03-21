@@ -5,11 +5,41 @@ import { AxiosError } from "axios";
 // Types
 interface Gig {
   _id: string;
-  title: string;
-  connect_price: number;
-  duration: string;
-  createdAt: string;
-  updatedAt: string;
+  connect_price: Number;
+  created_on: Date;
+
+  tz_date: Date;
+  duration: String;
+  engagement: String;
+
+  freelancers_to_hire: Number;
+  amount_amount: Number;
+
+  hourly_rate: Number;
+
+  type: String;
+  job_ts: Number;
+  proposals_tier: String;
+
+  published_on: Date;
+  tier: String;
+  title: String;
+  uid: Number;
+  total_freelancers_to_hire: Number;
+
+  client_company_org_uid: Number;
+
+  client_payment_verification_status: Number;
+
+  client_total_feedback: Number;
+
+  occupations_category_pref_label: String;
+  occupations_oservice_pref_label: String;
+  client_total_reviews: Number;
+
+  client_total_spent: Number;
+
+  client_location_country: String;
 }
 
 interface Pagination {
@@ -21,6 +51,7 @@ interface Pagination {
 interface GigsStore {
   gigs: Gig[];
   loading: boolean;
+  success: boolean;
   error: string | null;
   pagination: Pagination;
   fetchGigs: (page?: number, limit?: number) => Promise<void>;
@@ -39,19 +70,20 @@ export const useGigsStore = create<GigsStore>((set) => ({
     totalPages: 1,
     totalGigs: 0,
   },
+  success: false,
 
   // Fetch Gigs with Pagination
   fetchGigs: async (page = 1, limit = 10) => {
     set({ loading: true, error: null });
 
     try {
-      const response = await apiClient.get(
-        `/gigs/?page=${page}&limit=${limit}`
-      );
+      const response = await apiClient.get("/gigs/");
+      console.log(response);
 
       set({
         gigs: response.data.data,
-        pagination: response.data.meta.pagination,
+        pagination: response.data.message.pagination,
+        success: true,
         loading: false,
       });
     } catch (error) {
