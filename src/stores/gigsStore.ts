@@ -50,11 +50,13 @@ interface Pagination {
 
 interface GigsStore {
   gigs: Gig[];
+  singleGig: Gig;
   loading: boolean;
   success: boolean;
   error: string | null;
   pagination: Pagination;
   fetchGigs: (page?: number, limit?: number) => Promise<void>;
+  fetchSingleGig: (gigId: string) => Promise<void>;
   createGig: (gigData: Partial<Gig>) => Promise<void>;
   updateGig: (id: string, updatedData: Partial<Gig>) => Promise<void>;
   deleteGig: (id: string) => Promise<void>;
@@ -63,6 +65,33 @@ interface GigsStore {
 
 export const useGigsStore = create<GigsStore>((set) => ({
   gigs: [],
+  singleGig: {
+    _id: "",
+    connect_price: 0,
+    created_on: new Date(),
+    tz_date: new Date(),
+    duration: "",
+    engagement: "",
+    freelancers_to_hire: 0,
+    amount_amount: 0,
+    hourly_rate: 0,
+    type: "",
+    job_ts: 0,
+    proposals_tier: "",
+    published_on: new Date(),
+    tier: "",
+    title: "",
+    uid: 0,
+    total_freelancers_to_hire: 0,
+    client_company_org_uid: 0,
+    client_payment_verification_status: 0,
+    client_total_feedback: 0,
+    occupations_category_pref_label: "",
+    occupations_oservice_pref_label: "",
+    client_total_reviews: 0,
+    client_total_spent: 0,
+    client_location_country: "",
+  },
   loading: false,
   error: null,
   pagination: {
@@ -78,8 +107,6 @@ export const useGigsStore = create<GigsStore>((set) => ({
 
     try {
       const response = await apiClient.get("/gigs/");
-      console.log(response);
-
       set({
         gigs: response.data.data,
         pagination: response.data.message.pagination,
@@ -92,6 +119,16 @@ export const useGigsStore = create<GigsStore>((set) => ({
         error: (axiosError.response?.data as string) || "Failed to fetch gigs",
         loading: false,
       });
+    }
+  },
+
+  fetchSingleGig: async (gigId: string) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await apiClient(`/gigs/${gigId}`);
+      set({ singleGig: response.data.data, loading: false, error: null });
+    } catch (error: any) {
+      set({ loading: false, error: error.message });
     }
   },
 
