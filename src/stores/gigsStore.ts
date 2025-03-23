@@ -2,44 +2,55 @@ import { create } from "zustand";
 import apiClient from "../utils/axiosInterceptors";
 import { AxiosError } from "axios";
 
-// Types
+// ✅ Types
 interface Gig {
-  _id: string;
-  connect_price: Number;
-  created_on: Date;
+  clientId: string;
+  email: string;
+  location: string;
+  gigs: {
+    gigId: string;
+    title: string;
+    type: string;
+    hourly_rate: number;
+    amount_amount: number;
+    duration: string;
+    engagement: string;
+    Description: string;
+    client_location_country: string;
+    tier: string;
+    Status: string;
+    created_on: Date;
+    published_on: Date;
 
-  tz_date: Date;
-  duration: String;
-  engagement: String;
+    client_total_reviews: number;
+    client_total_spent: number;
+    proposals_tier: string;
+  };
+}
 
-  freelancers_to_hire: Number;
-  amount_amount: Number;
+interface SingleGig {
+  clientId: string;
+  email: string;
+  location: string;
+  gig: {
+    gigId: string;
+    title: string;
+    type: string;
+    hourly_rate: number;
+    amount_amount: number;
+    duration: string;
+    engagement: string;
+    Description: string;
+    client_location_country: string;
+    tier: string;
+    Status: string;
+    created_on: Date;
+    published_on: Date;
 
-  hourly_rate: Number;
-
-  type: String;
-  job_ts: Number;
-  proposals_tier: String;
-
-  published_on: Date;
-  tier: String;
-  title: String;
-  uid: Number;
-  total_freelancers_to_hire: Number;
-
-  client_company_org_uid: Number;
-
-  client_payment_verification_status: Number;
-
-  client_total_feedback: Number;
-
-  occupations_category_pref_label: String;
-  occupations_oservice_pref_label: String;
-  client_total_reviews: Number;
-
-  client_total_spent: Number;
-
-  client_location_country: String;
+    client_total_reviews: number;
+    client_total_spent: number;
+    proposals_tier: string;
+  };
 }
 
 interface Pagination {
@@ -50,48 +61,30 @@ interface Pagination {
 
 interface GigsStore {
   gigs: Gig[];
-  singleGig: Gig;
+  recommendedGigs: Gig[];
+  singleGig: SingleGig | null;
   loading: boolean;
   success: boolean;
   error: string | null;
   pagination: Pagination;
   fetchGigs: (page?: number, limit?: number) => Promise<void>;
   fetchSingleGig: (gigId: string) => Promise<void>;
-  createGig: (gigData: Partial<Gig>) => Promise<void>;
-  updateGig: (id: string, updatedData: Partial<Gig>) => Promise<void>;
-  deleteGig: (id: string) => Promise<void>;
+  createGig: (clientId: string, gigData: Partial<Gig>) => Promise<void>;
+  updateGig: (
+    clientId: string,
+    gigId: string,
+    updatedData: Partial<Gig>
+  ) => Promise<void>;
+  deleteGig: (clientId: string, gigId: string) => Promise<void>;
+  setRecentlyViewedGig: (gigId: string) => void;
+  loadRecommendedGigsOnStartup: () => void;
   clearError: () => void;
 }
 
 export const useGigsStore = create<GigsStore>((set) => ({
   gigs: [],
-  singleGig: {
-    _id: "",
-    connect_price: 0,
-    created_on: new Date(),
-    tz_date: new Date(),
-    duration: "",
-    engagement: "",
-    freelancers_to_hire: 0,
-    amount_amount: 0,
-    hourly_rate: 0,
-    type: "",
-    job_ts: 0,
-    proposals_tier: "",
-    published_on: new Date(),
-    tier: "",
-    title: "",
-    uid: 0,
-    total_freelancers_to_hire: 0,
-    client_company_org_uid: 0,
-    client_payment_verification_status: 0,
-    client_total_feedback: 0,
-    occupations_category_pref_label: "",
-    occupations_oservice_pref_label: "",
-    client_total_reviews: 0,
-    client_total_spent: 0,
-    client_location_country: "",
-  },
+  recommendedGigs: [],
+  singleGig: null,
   loading: false,
   error: null,
   pagination: {
@@ -101,22 +94,43 @@ export const useGigsStore = create<GigsStore>((set) => ({
   },
   success: false,
 
-  // Fetch Gigs with Pagination
+  setRecentlyViewedGig: (gigId: string) => {
+    localStorage.setItem("recentlyViewedGigId", gigId);
+  },
+
+  loadRecommendedGigsOnStartup: async () => {
+    const gigId = localStorage.getItem("recentlyViewedGigId");
+    if (gigId) {
+      await useGigsStore.getState().fetchGigs();
+    }
+  },
+
   fetchGigs: async (page = 1, limit = 10) => {
     set({ loading: true, error: null });
 
     try {
-      const response = await apiClient.get("/gigs/");
+      let gigId = localStorage.getItem("recentlyViewedGigId");
+
+      const queryString = gigId
+        ? `/gigs/?page=${page}&limit=${limit}&gigId=${gigId}`
+        : `/gigs/?page=${page}&limit=${limit}`;
+
+      const response = await apiClient.get(queryString);
+
+      const allGigs = response.data.data;
+
       set({
-        gigs: response.data.data,
+        gigs: allGigs,
+        recommendedGigs: allGigs,
         pagination: response.data.message.pagination,
-        success: true,
         loading: false,
       });
     } catch (error) {
       const axiosError = error as AxiosError;
       set({
-        error: (axiosError.response?.data as string) || "Failed to fetch gigs",
+        error:
+          (axiosError.response?.data as { message?: string })?.message ||
+          "Failed to fetch gigs",
         loading: false,
       });
     }
@@ -124,20 +138,40 @@ export const useGigsStore = create<GigsStore>((set) => ({
 
   fetchSingleGig: async (gigId: string) => {
     set({ loading: true, error: null });
+
     try {
-      const response = await apiClient(`/gigs/${gigId}`);
-      set({ singleGig: response.data.data, loading: false, error: null });
-    } catch (error: any) {
-      set({ loading: false, error: error.message });
+      const response = await apiClient.get(`/gigs/${gigId}`);
+
+      const item = response.data.data;
+
+      const flattenedGig = {
+        ...item.gig,
+        clientId: item.clientId,
+        email: item.email,
+        location: item.location,
+      };
+
+      set({ singleGig: item, loading: false, error: null });
+      // set().setRecentlyViewedGig(gigId);
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      set({
+        error:
+          (axiosError.response?.data as { message?: string })?.message ||
+          "Failed to fetch gigs",
+        loading: false,
+      });
     }
   },
 
-  // Create Gig
-  createGig: async (gigData: Partial<Gig>) => {
+  createGig: async (clientId: string, gigData: Partial<Gig>) => {
     set({ loading: true, error: null });
 
     try {
-      const response = await apiClient.post("/gigs/create", gigData);
+      const response = await apiClient.post(
+        `/gigs/create/${clientId}`,
+        gigData
+      );
 
       set((state) => ({
         gigs: [...state.gigs, response.data.data],
@@ -146,60 +180,64 @@ export const useGigsStore = create<GigsStore>((set) => ({
     } catch (error) {
       const axiosError = error as AxiosError;
       set({
-        error: (axiosError.response?.data as string) || "Failed to create gig",
+        error:
+          (axiosError.response?.data as { message?: string })?.message ||
+          "Failed to create gig",
         loading: false,
       });
     }
   },
 
-  // Update Gig
-  updateGig: async (_id: string, updatedData: Partial<Gig>) => {
+  updateGig: async (
+    clientId: string,
+    gigId: string,
+    updatedData: Partial<Gig>
+  ) => {
     set({ loading: true, error: null });
 
     try {
-      const response = await apiClient.put(`/gigs/update/${_id}`, updatedData);
+      const response = await apiClient.put(
+        `/gigs/${clientId}/${gigId}`,
+        updatedData
+      );
 
-      // Update the gig in the store
       set((state) => ({
         gigs: state.gigs.map((gig) =>
-          gig._id === _id ? response.data.data : gig
+          gig.gigs.gigId === gigId ? { ...gig, ...updatedData } : gig
         ),
         loading: false,
       }));
     } catch (error) {
       const axiosError = error as AxiosError;
       set({
-        error: (axiosError.response?.data as string) || "Failed to update gig",
+        error:
+          (axiosError.response?.data as { message?: string })?.message ||
+          "Failed to update gig",
         loading: false,
       });
     }
   },
 
-  // Delete Gig
-  deleteGig: async (id: string) => {
+  deleteGig: async (clientId: string, gigId: string) => {
     set({ loading: true, error: null });
 
     try {
-      await apiClient.delete(`/gigs/delete/${id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // JWT token
-        },
-      });
+      await apiClient.delete(`/gigs/${clientId}/${gigId}`);
 
-      // Remove the deleted gig from the store
       set((state) => ({
-        gigs: state.gigs.filter((gig) => gig._id !== id),
+        gigs: state.gigs.filter((gig) => gig.gigs.gigId !== gigId),
         loading: false,
       }));
     } catch (error) {
       const axiosError = error as AxiosError;
       set({
-        error: (axiosError.response?.data as string) || "Failed to delete gig",
+        error:
+          (axiosError.response?.data as { message?: string })?.message ||
+          "Failed to delete gig",
         loading: false,
       });
     }
   },
 
-  // Clear Errors
   clearError: () => set({ error: null }),
 }));
