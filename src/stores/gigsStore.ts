@@ -63,7 +63,6 @@ interface Pagination {
 
 interface GigsStore {
   gigs: Gig[];
-  recommendedGigs: Gig[];
   singleGig: SingleGig | null;
   loading: boolean;
   success: boolean;
@@ -85,7 +84,6 @@ interface GigsStore {
 
 export const useGigsStore = create<GigsStore>((set) => ({
   gigs: [],
-  recommendedGigs: [],
   singleGig: null,
   loading: false,
   error: null,
@@ -107,11 +105,11 @@ export const useGigsStore = create<GigsStore>((set) => ({
     }
   },
 
-  fetchGigs: async (page = 1, limit = 30) => {
+  fetchGigs: async (page = 1, limit = 10) => {
     set({ loading: true, error: null });
 
     try {
-      let gigId = localStorage.getItem("recentlyViewedGigId");
+      const gigId = localStorage.getItem("recentlyViewedGigId") || "";
 
       const queryString = gigId
         ? `/gigs/?page=${page}&limit=${limit}&gigId=${gigId}`
@@ -123,8 +121,7 @@ export const useGigsStore = create<GigsStore>((set) => ({
 
       set({
         gigs: allGigs,
-        recommendedGigs: allGigs,
-        pagination: response.data.message.pagination,
+        pagination: response.data.message.pagination, // ✅ Store pagination data
         loading: false,
       });
     } catch (error) {
