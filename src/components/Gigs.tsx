@@ -56,8 +56,8 @@ function Gigs(gig: Gig) {
 
   return (
     <div
-      className="bg-white shadow-md rounded-2xl p-6 transition transform hover:scale-105 hover:shadow-lg w-[500px] cursor-pointer"
-      onClick={handleClick} // ✅ Trigger click event
+      className="bg-cyan-200 shadow-md rounded-2xl p-3  transition transform hover:scale-105 hover:shadow-lg w-[380px] cursor-pointer"
+      onClick={handleClick}
     >
       <h2 className="text-xl font-bold text-gray-800">{title}</h2>
       <div className="text-sm text-gray-500 mt-2">{type}</div>

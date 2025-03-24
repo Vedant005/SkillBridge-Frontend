@@ -33,7 +33,7 @@ function GigsPage() {
           ) : (
             <>
               <h2 className="text-2xl font-bold mt-8">All Gigs</h2>
-              <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-7 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {gigs.map((gig, index) => (
                   <Gigs
                     key={gig.gigs.gigId} // ✅ Fallback key
