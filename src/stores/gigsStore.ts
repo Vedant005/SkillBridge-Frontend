@@ -21,7 +21,8 @@ interface Gig {
     Status: string;
     created_on: Date;
     published_on: Date;
-
+    occupations_category_pref_label: string;
+    occupations_oservice_pref_label: string;
     client_total_reviews: number;
     client_total_spent: number;
     proposals_tier: string;
@@ -46,7 +47,8 @@ interface SingleGig {
     Status: string;
     created_on: Date;
     published_on: Date;
-
+    occupations_category_pref_label: string;
+    occupations_oservice_pref_label: string;
     client_total_reviews: number;
     client_total_spent: number;
     proposals_tier: string;
@@ -105,7 +107,7 @@ export const useGigsStore = create<GigsStore>((set) => ({
     }
   },
 
-  fetchGigs: async (page = 1, limit = 10) => {
+  fetchGigs: async (page = 1, limit = 30) => {
     set({ loading: true, error: null });
 
     try {
