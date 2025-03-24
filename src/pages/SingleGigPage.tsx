@@ -144,7 +144,8 @@ function SingleGigPage() {
               <strong>Client Reviews:</strong> {client_total_reviews}
             </p>
             <p className="text-lg text-gray-700 flex items-center">
-              💰 <strong>Total Expenditure:</strong> ${client_total_spent}
+              💰 <strong>Client Total Expenditure:</strong> $
+              {client_total_spent}
             </p>
           </div>
 
