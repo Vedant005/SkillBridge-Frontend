@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useGigsStore } from "../stores/gigsStore";
 import Gigs from "../components/Gigs";
 import Header from "../components/Header";
@@ -6,14 +6,19 @@ import Lottie from "lottie-react";
 import loadingAnimation from "../animations/loading_ani.json";
 
 function GigsPage() {
-  const { fetchGigs, gigs, recommendedGigs, loading, pagination } =
-    useGigsStore();
+  const { fetchGigs, gigs, loading, pagination } = useGigsStore();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit] = useState(9);
 
   useEffect(() => {
-    fetchGigs();
-  }, []);
+    fetchGigs(currentPage, limit);
+  }, [currentPage, limit]);
 
-  console.log(gigs);
+  const handlePageChange = (newPage: number) => {
+    if (newPage > 0 && newPage <= pagination.totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
 
   return (
     <div className="w-full">
@@ -32,14 +37,39 @@ function GigsPage() {
             </div>
           ) : (
             <>
-              <h2 className="text-2xl font-bold mt-8">All Gigs</h2>
+              <h2 className="text-2xl font-bold mb-4">All Gigs</h2>
+
               <div className="grid gap-7 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                {gigs.map((gig, index) => (
-                  <Gigs
-                    key={gig.gigs.gigId} // ✅ Fallback key
-                    {...gig}
-                  />
+                {gigs.map((gig) => (
+                  <Gigs key={gig.gigs.gigId} {...gig} />
                 ))}
+              </div>
+              <div className="flex justify-between items-center mt-10">
+                <button
+                  className={`px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition ${
+                    currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  ◀️ Previous
+                </button>
+
+                <div className="text-lg font-semibold">
+                  Page {currentPage} of {pagination.totalPages}
+                </div>
+
+                <button
+                  className={`px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition ${
+                    currentPage === pagination.totalPages
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === pagination.totalPages}
+                >
+                  Next ▶️
+                </button>
               </div>
             </>
           )}
