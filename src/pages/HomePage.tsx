@@ -186,7 +186,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <section className="bg-red-600 text-white text-center py-20">
+      <section className="bg-red-600 text-white text-center py-20 rounded-2xl m-6">
         <h2 className="text-5xl font-extrabold mb-6">
           🔥 Get Started with SKILLBRIDGE
         </h2>
