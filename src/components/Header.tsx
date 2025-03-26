@@ -8,7 +8,7 @@ function Header() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="bg-white shadow-md py-4 px-8">
+    <header className="bg-white  py-4 px-8 sticky">
       <nav className="container mx-auto flex justify-between items-center">
         <div
           onClick={() => navigate("/")}

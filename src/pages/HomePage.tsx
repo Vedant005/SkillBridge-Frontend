@@ -73,10 +73,10 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen">
       <Header />
 
-      <section className="bg-gradient-to-r from-green-600 to-emerald-500 text-white py-20 px-8">
+      <section className="bg-gradient-to-r from-green-600 to-emerald-500 text-white py-20 px-8 m-7 rounded-2xl">
         <div className="container mx-auto text-center">
           <h1 className="text-5xl md:text-7xl font-extrabold mb-6">
             Find the right{" "}
@@ -89,7 +89,6 @@ export default function Home() {
             project, big or small.
           </p>
 
-          {/* ✅ Search Bar */}
           <div className="flex max-w-lg mx-auto">
             <input
               type="text"
@@ -143,7 +142,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-gray-50 py-20 px-8">
+      <section className="py-20 px-8">
         <div className="container mx-auto">
           <h2 className="text-4xl font-extrabold text-gray-800 mb-12">
             ✨ Top Talents
