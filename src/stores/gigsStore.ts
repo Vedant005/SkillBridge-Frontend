@@ -39,6 +39,7 @@ interface SingleGig {
     type: string;
     hourly_rate: number;
     amount_amount: number;
+    sentiment: string;
     duration: string;
     engagement: string;
     Description: string;
