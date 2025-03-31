@@ -65,10 +65,17 @@ interface Pagination {
 interface GigsStore {
   gigs: Gig[];
   singleGig: SingleGig | null;
+  answer: string;
+  predictedPrice: number;
   loading: boolean;
   success: boolean;
   error: string | null;
   pagination: Pagination;
+  chatbotHandler: (
+    query?: string,
+    page?: number,
+    limit?: number
+  ) => Promise<void>;
   fetchGigs: (page?: number, limit?: number) => Promise<void>;
   fetchSingleGig: (gigId: string) => Promise<void>;
   createGig: (clientId: string, gigData: Partial<Gig>) => Promise<void>;
@@ -78,6 +85,7 @@ interface GigsStore {
     updatedData: Partial<Gig>
   ) => Promise<void>;
   deleteGig: (clientId: string, gigId: string) => Promise<void>;
+  predictPrice: (data: Gig) => Promise<void>;
   setRecentlyViewedGig: (gigId: string) => void;
   loadRecommendedGigsOnStartup: () => void;
   clearError: () => void;
@@ -86,6 +94,8 @@ interface GigsStore {
 export const useGigsStore = create<GigsStore>((set) => ({
   gigs: [],
   singleGig: null,
+  answer: "",
+  predictedPrice: 0,
   loading: false,
   error: null,
   pagination: {
@@ -103,6 +113,27 @@ export const useGigsStore = create<GigsStore>((set) => ({
     const gigId = localStorage.getItem("recentlyViewedGigId");
     if (gigId) {
       await useGigsStore.getState().fetchGigs();
+    }
+  },
+
+  chatbotHandler: async (query, page = 1, limit = 10) => {
+    set({ loading: true, error: null });
+
+    try {
+      const response = await apiClient.post(
+        `/gigs/chat/?page=${page}&limit=${limit}`,
+        query
+      );
+
+      set({ answer: response.data.data, loading: false, error: null });
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      set({
+        error:
+          (axiosError.response?.data as { message?: string })?.message ||
+          "Failed to connect with chatbot",
+        loading: false,
+      });
     }
   },
 
@@ -234,6 +265,24 @@ export const useGigsStore = create<GigsStore>((set) => ({
         error:
           (axiosError.response?.data as { message?: string })?.message ||
           "Failed to delete gig",
+        loading: false,
+      });
+    }
+  },
+
+  predictPrice: async (data) => {
+    set({ loading: true, error: null });
+
+    try {
+      const response = await apiClient.post("/gigs/predict-price", data);
+
+      set({ predictedPrice: response.data.data, loading: false, error: null });
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      set({
+        error:
+          (axiosError.response?.data as { message?: string })?.message ||
+          "Failed to predict price",
         loading: false,
       });
     }
