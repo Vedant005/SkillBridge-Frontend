@@ -2,7 +2,6 @@ import { create } from "zustand";
 import apiClient from "../utils/axiosInterceptors";
 import { AxiosError } from "axios";
 
-// ✅ Types
 interface Gig {
   clientId: string;
   email: string;
@@ -65,17 +64,13 @@ interface Pagination {
 interface GigsStore {
   gigs: Gig[];
   singleGig: SingleGig | null;
-  answer: string;
+
   predictedPrice: number;
   loading: boolean;
   success: boolean;
   error: string | null;
   pagination: Pagination;
-  chatbotHandler: (
-    query?: string,
-    page?: number,
-    limit?: number
-  ) => Promise<void>;
+
   fetchGigs: (page?: number, limit?: number) => Promise<void>;
   fetchSingleGig: (gigId: string) => Promise<void>;
   createGig: (clientId: string, gigData: Partial<Gig>) => Promise<void>;
@@ -94,7 +89,7 @@ interface GigsStore {
 export const useGigsStore = create<GigsStore>((set) => ({
   gigs: [],
   singleGig: null,
-  answer: "",
+
   predictedPrice: 0,
   loading: false,
   error: null,
@@ -116,27 +111,6 @@ export const useGigsStore = create<GigsStore>((set) => ({
     }
   },
 
-  chatbotHandler: async (query, page = 1, limit = 10) => {
-    set({ loading: true, error: null });
-
-    try {
-      const response = await apiClient.post(
-        `/gigs/chat/?page=${page}&limit=${limit}`,
-        query
-      );
-
-      set({ answer: response.data.data, loading: false, error: null });
-    } catch (error) {
-      const axiosError = error as AxiosError;
-      set({
-        error:
-          (axiosError.response?.data as { message?: string })?.message ||
-          "Failed to connect with chatbot",
-        loading: false,
-      });
-    }
-  },
-
   fetchGigs: async (page = 1, limit = 10) => {
     set({ loading: true, error: null });
 
@@ -151,11 +125,15 @@ export const useGigsStore = create<GigsStore>((set) => ({
 
       const allGigs = response.data.data;
 
-      set({
-        gigs: allGigs,
-        pagination: response.data.message.pagination, // ✅ Store pagination data
-        loading: false,
-      });
+      if (allGigs.length > 0) {
+        set({
+          gigs: allGigs, // ✅ Only update gigs when new data is received
+          pagination: response.data.message.pagination,
+          loading: false,
+        });
+      } else {
+        set({ loading: false }); // ✅ Prevent resetting gigs to an empty array
+      }
     } catch (error) {
       const axiosError = error as AxiosError;
       set({
