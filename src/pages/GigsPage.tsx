@@ -4,6 +4,7 @@ import Gigs from "../components/Gigs";
 import Header from "../components/Header";
 import Lottie from "lottie-react";
 import loadingAnimation from "../animations/loading_ani.json";
+import Chatbot from "../components/Chatbot";
 
 function GigsPage() {
   const { fetchGigs, gigs, loading, pagination } = useGigsStore();
@@ -12,7 +13,7 @@ function GigsPage() {
 
   useEffect(() => {
     fetchGigs(currentPage, limit);
-  }, [currentPage, limit]);
+  }, [currentPage, limit]); // Add dependencies to prevent infinite loop
 
   const handlePageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= pagination.totalPages) {
@@ -75,6 +76,7 @@ function GigsPage() {
           )}
         </main>
       </div>
+      <Chatbot />
     </div>
   );
 }
