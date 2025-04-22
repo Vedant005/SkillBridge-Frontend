@@ -1,13 +1,21 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL, // Vite uses import.meta.env
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   withCredentials: true,
 });
 
 type SubscriberCallback = (accessToken: string) => void;
 let subscribers: SubscriberCallback[] = [];
 let isRefreshing = false;
+
+const getUserRole = (): "freelancer" | "client" | null => {
+  const storedRole = localStorage.getItem("userRole");
+  if (storedRole === "freelancer" || storedRole === "client") {
+    return storedRole;
+  }
+  return null;
+};
 
 const onRefreshed = (accessToken: string): void => {
   subscribers.forEach((callback) => callback(accessToken));
@@ -37,8 +45,20 @@ apiClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        const role = getUserRole();
+        const endpoint =
+          role === "freelancer"
+            ? "/freelancer/refresh-token"
+            : role === "client"
+            ? "/client/refresh-token"
+            : null;
+
+        if (!endpoint) {
+          throw new Error("No user role found");
+        }
+
         const refreshResponse = await apiClient.post<{ accessToken: string }>(
-          "/users/refresh-token",
+          endpoint,
           {},
           { withCredentials: true }
         );
@@ -50,35 +70,14 @@ apiClient.interceptors.response.use(
         if (originalRequest.headers) {
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         }
+
         return apiClient(originalRequest);
       } catch (refreshError) {
         isRefreshing = false;
         window.dispatchEvent(new Event("forceLogout"));
 
-        const refreshErrorData = (refreshError as AxiosError)?.response?.data;
-        if (
-          refreshErrorData &&
-          typeof refreshErrorData === "object" &&
-          "message" in refreshErrorData &&
-          refreshErrorData.message === "TokenExpired"
-        ) {
-          return Promise.resolve(null);
-        }
-
-        return new Promise<null>((resolve) => {
-          window.dispatchEvent(new Event("forceLogout"));
-          resolve(null);
-        });
+        return Promise.resolve(null);
       }
-    }
-
-    if (
-      error.response?.data &&
-      typeof error.response.data === "object" &&
-      "message" in error.response.data &&
-      error.response.data.message === "TokenExpired"
-    ) {
-      return Promise.resolve();
     }
 
     return Promise.reject(error);
