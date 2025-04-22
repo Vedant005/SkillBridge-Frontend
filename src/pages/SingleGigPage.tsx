@@ -20,6 +20,7 @@ function SingleGigPage() {
   const { gigId } = useParams<{ gigId: string }>();
   const navigate = useNavigate();
   const [showSentiment, setShowSentiment] = useState(false);
+  const [applied, setApplied] = useState(false);
 
   useEffect(() => {
     if (gigId) {
@@ -223,6 +224,26 @@ function SingleGigPage() {
           <p className="text-md text-gray-600 mt-4 leading-relaxed">
             {Description || "No description provided."}
           </p>
+        </div>
+
+        <div className="mt-10 text-center">
+          {applied ? (
+            <motion.div
+              className="text-xl font-semibold text-green-600 bg-green-100 p-4 rounded-md inline-block"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              ✅ Successfully applied!
+            </motion.div>
+          ) : (
+            <button
+              onClick={() => setApplied(true)}
+              className="mt-6 bg-blue-500 text-white px-6 py-3 rounded-md shadow-md hover:bg-blue-600 transition transform hover:scale-105"
+            >
+              🚀 Apply Now
+            </button>
+          )}
         </div>
       </div>
     </div>
