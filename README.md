@@ -3,8 +3,8 @@
 A full-stack freelancing platform connecting clients and freelancers with intelligent ML-powered features for personalized gig experiences, real-time communication, and seamless UI/UX.
 
 [![Frontend Repository](https://img.shields.io/badge/GitHub-Frontend-blue?logo=github)](https://github.com/Vedant005/SkillBridge-Frontend)
-[![Backend Repository](https://img.shields.io/badge/GitHub-Frontend-blue?logo=github)](https://github.com/Vedant005/SkillBridge-Backend)
-[![ML Repository](https://img.shields.io/badge/GitHub-Frontend-blue?logo=github)](https://github.com/Vedant005/Flask-ML)
+[![Backend Repository](https://img.shields.io/badge/GitHub-Backend-blue?logo=github)](https://github.com/Vedant005/SkillBridge-Backend)
+[![ML Repository](https://img.shields.io/badge/GitHub-ML-blue?logo=github)](https://github.com/Vedant005/Flask-ML)
 
 ---
 
