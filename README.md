@@ -4,17 +4,13 @@ A full-stack freelancing platform connecting clients and freelancers with intell
 
 [![Frontend Repository](https://img.shields.io/badge/GitHub-Frontend-blue?logo=github)](https://github.com/Vedant005/SkillBridge-Frontend)
 [![Backend Repository](https://img.shields.io/badge/GitHub-Backend-blue?logo=github)](https://github.com/Vedant005/SkillBridge-Backend)
-[![ML Repository](https://img.shields.io/badge/GitHub-ML-blue?logo=github)](https://github.com/Vedant005/Flask-ML)
+[![ML Repository](https://img.shields.io/badge/GitHub-ML-blue?logo=github)](https://github.com/Vedant005/Skillbridge-ML)
 
 ---
 
 ## 🚀 Tech Stack
 
 - **Frontend**: React.js, TypeScript, Zustand, Axios, TailwindCSS
-- **Backend**: Node.js, Express.js
-- **ML Services**: Python (Flask) – Recommendation, Sentiment Analysis, Price Prediction
-- **Database**: MongoDB
-- **NLP Chatbot**: Hugging Face supported assistant
 
 ---
 
@@ -41,28 +37,6 @@ A full-stack freelancing platform connecting clients and freelancers with intell
 
 - Helps users with platform navigation and freelance-related queries
 
----
-
-## 🧠 ML Models
-
-#### 1. Gig Recommendation
-
-- Algorithm: Cosine Similarity
-- Suggests top-N similar gigs based on user activity
-
-#### 2. Sentiment Analysis
-
-- Model: Logistic Regression / Transformer-based classifier
-- Output: Positive, Neutral, or Negative
-
-#### 3. Price Prediction
-
-- Model: Random Forest Regressor
-- Inputs: Title, Description, Category, Skills
-- Output: Predicted gig price
-
----
-
 ## 📁 Project Setup
 
 ### Frontend Setup
@@ -73,27 +47,5 @@ gh repo clone Vedant005/SkillBridge-Frontend
 
 ```
 cd SkillBridge-Frontend
-npm install
-```
-
-### Backend Setup
-
-```
-gh repo clone Vedant005/SkillBridge-Backend
-```
-
-```
-cd SkillBridge-Backend
-npm install
-```
-
-### Flask Setup
-
-```
-gh repo clone Vedant005/Flask-ML
-```
-
-```
-cd Flask-ML
 npm install
 ```
