@@ -16,24 +16,24 @@ A full-stack freelancing platform connecting clients and freelancers with intell
 
 ## 🌟 Features
 
-### 🔗 Full-Stack Freelancing Platform
+### Full-Stack Freelancing Platform
 
 - User roles: **Client** and **Freelancer**
 - Clients can post gigs and hire freelancers
 - Freelancers can browse, apply, and manage gigs
 
-### 🤖 Integrated Machine Learning Models
+### Integrated Machine Learning Models
 
 - **Gig Recommendation System**: Personalized gig suggestions using cosine similarity
 - **Sentiment Analysis**: Analyzes reviews to classify user sentiment
 - **Price Prediction**: Suggests gig pricing using a Random Forest model
 
-### 📱 Responsive UI/UX
+### Responsive UI/UX
 
 - Built with **React + TypeScript** and styled with **Tailwind CSS**
 - Fully mobile-friendly design
 
-### 💡 NLP-Powered Chatbot
+### NLP-Powered Chatbot
 
 - Helps users with platform navigation and freelance-related queries
 
